@@ -1,0 +1,32 @@
+pragma solidity ^0.8.4;
+
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+
+contract MyNFT is ERC721 {
+    uint256 public constant MAX_SUPPLY = 10000;
+    uint256 public nextTokenId = 1;
+    mapping(address => bool) public whitelist;
+
+    constructor() ERC721("tomato", "TOMATO") {}
+
+    function mint() public payable {
+        require(nextTokenId <= MAX_SUPPLY, "Maximum supply reached");
+        require(msg.value == 0.0006 ether, "Incorrect price");
+        require(whitelist[msg.sender], "You are not whitelisted");
+
+        _safeMint(msg.sender, nextTokenId);
+        nextTokenId++;
+    }
+
+    function addToWhitelist(address[] memory _addresses) public {
+        for (uint i = 0; i < _addresses.length; i++) {
+            whitelist[_addresses[i]] = true;
+        }
+    }
+
+    function removeFromWhitelist(address[] memory _addresses) public {
+        for (uint i = 0; i < _addresses.length; i++) {
+            whitelist[_addresses[i]] = false;
+        }
+    }
+}
